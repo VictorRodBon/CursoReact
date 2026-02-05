@@ -1,73 +1,75 @@
 import { useState } from 'react'
 import './App.css'
-import confetti from 'canvas-confetti'
+import confetti from "canvas-confetti"
 
-import { Square } from './components/Square.jsx'
+import { Square } from "./components/Square.jsx"
 
 import { TURNS, WINNER_COMBOS } from './constants.js'
 
-function App () {
-  const [board, setBoard] = useState(() => {
-    const boardFromStorage = window.localStorage.getItem('board')
+function App() {
 
+
+  const [board,setBoard]=useState(()=>{
+    const boardFromStorage=window.localStorage.getItem('board');
+    
     return boardFromStorage ? JSON.parse(boardFromStorage) : Array(9).fill(null)
-  })
+  });
+  
+  const [turn, setTurn]=useState(()=>{
+    const turnFromStorage=window.localStorage.getItem('turn');
 
-  const [turn, setTurn] = useState(() => {
-    const turnFromStorage = window.localStorage.getItem('turn')
+    return turnFromStorage ? JSON.parse(turnFromStorage) :  TURNS.X
+  });
 
-    return turnFromStorage ? JSON.parse(turnFromStorage) : TURNS.X
-  })
+  const[winner,setWinner]=useState(null)
 
-  const [winner, setWinner] = useState(null)
-
-  const checkWinner = (boardToCheck) => {
-    for (const combo of WINNER_COMBOS) {
-      const [a, b, c] = combo
-      if (
-        boardToCheck[a] &&
-        boardToCheck[a] === boardToCheck[b] &&
-        boardToCheck[a] === boardToCheck[c]
-      ) {
+  const checkWinner=(boardToCheck)=>{
+    for(const combo of WINNER_COMBOS){
+      const [a,b,c]=combo;
+      if(
+        boardToCheck[a] && 
+        boardToCheck[a]===boardToCheck[b] &&
+        boardToCheck[a]===boardToCheck[c] 
+      ){
         return boardToCheck[a]
       }
     }
-    return null
+    return null  
   }
 
-  const resetGame = () => {
+  const resetGame=()=>{
     setBoard(Array(9).fill(null))
     setTurn(TURNS.X)
     setWinner(null)
 
-    window.localStorage.removeItem('board')
-    window.localStorage.removeItem('turn')
+    window.localStorage.removeItem('board');
+    window.localStorage.removeItem('turn');
   }
 
-  const checkEndGame = (newBoard) => {
-    return newBoard.every((square) => square !== null)
+  const checkEndGame =(newBoard)=>{
+    return newBoard.every((square)=>square!==null)
   }
 
-  const updateBoard = (index) => {
-    if (board[index] || winner) return
+  const updateBoard=(index)=>{
+    if(board[index] || winner) return
 
-    const newBoard = [...board]
-    newBoard[index] = turn
+    const newBoard=[...board]
+    newBoard[index]=turn
     setBoard(newBoard)
 
-    const newTurn = turn === TURNS.X ? TURNS.O : TURNS.X
+    const newTurn= turn===TURNS.X ? TURNS.O : TURNS.X
     setTurn(newTurn)
 
     // guardar estado partida
-    window, localStorage.setItem('board', JSON.stringify(newBoard))
-    window, localStorage.setItem('turn', JSON.stringify(newTurn))
-
+    window.localStorage.setItem('board', JSON.stringify(newBoard));
+    window.localStorage.setItem('turn', JSON.stringify(newTurn));
+ 
     // comprobar ganador
-    const newWinner = checkWinner(newBoard)
-    if (newWinner) {
+    const newWinner=checkWinner(newBoard);
+    if(newWinner){
       confetti()
       setWinner(newWinner)
-    } else if (checkEndGame(newBoard)) {
+    }else if(checkEndGame(newBoard)){
       setWinner(false) // empate
     }
   }
@@ -75,9 +77,9 @@ function App () {
   return (
     <main className='board'>
       <h1>Tic Tac Toe</h1>
-      <section className='game'>
+      <section className="game">
         {
-          board.map((_, index) => {
+          board.map((_,index)=>{
             return (
               <Square
                 key={index}
@@ -95,22 +97,22 @@ function App () {
         <Square isSelected={turn === TURNS.O}>{TURNS.O}</Square>
       </section>
       {
-        winner !== null && (
-          <section className='winner'>
-            <div className='text'>
-              <h2>
-                {
-                winner === false ? 'empate' : 'Ganó: '
+        winner!==null&&(
+        <section className="winner">
+          <div className='text'>
+            <h2>
+              {
+                winner===false ? "empate" : "Ganó: "
               }
-              </h2>
-              <header className='win'>
-                {winner && <Square>{winner}</Square>}
-              </header>
-              <footer>
-                <button onClick={resetGame}>Empezar de nuevo</button>
-              </footer>
-            </div>
-          </section>
+            </h2>
+            <header className='win'>
+              {winner && <Square>{winner}</Square>}
+            </header>
+            <footer>
+              <button onClick={resetGame}>Empezar de nuevo</button>
+            </footer>
+          </div>
+        </section>
         )
       }
     </main>
